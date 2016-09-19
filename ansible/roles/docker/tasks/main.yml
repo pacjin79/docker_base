@@ -48,3 +48,19 @@
 - name: enable docker as a service and start at boot
   service: name=docker enabled=yes state=started
   become: true
+
+# Docker-compose section
+- stat: path="{{ docker_tools_path }}/docker-compose"
+  register: docker_comose_distro
+
+- name: download docker-compose distribution
+  get_url: 
+    url: "{{ docker_tools_compose_exe_url }}"
+    dest: "{{ docker_tools_path }}/docker-compose"
+    force: yes
+    mode: 0750
+    group: docker
+  async: 300
+  poll: 5
+  when: docker_comose_distro.stat.exists == false
+  become: true
